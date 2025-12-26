@@ -18,14 +18,14 @@ export default function PDFExport({ schedule }: PDFExportProps) {
     // Title
     doc.setFontSize(16);
     doc.setFont('helvetica', 'bold');
-    doc.text(schedule.exam_metadata.exam_name, pageWidth / 2, 20, { align: 'center' });
+    doc.text(schedule.exam_metadata.exam_name || 'Exam Schedule', pageWidth / 2, 20, { align: 'center' });
     
     // Metadata
     doc.setFontSize(10);
     doc.setFont('helvetica', 'normal');
-    doc.text(`Department: ${schedule.exam_metadata.department}`, 14, 35);
-    doc.text(`Semester: ${schedule.exam_metadata.semester}`, 14, 42);
-    doc.text(`Academic Year: ${schedule.exam_metadata.academic_year}`, 14, 49);
+    doc.text(`Department: ${schedule.exam_metadata.department || 'N/A'}`, 14, 35);
+    doc.text(`Semester: ${schedule.exam_metadata.semester || 'N/A'}`, 14, 42);
+    doc.text(`Academic Year: ${schedule.exam_metadata.academic_year || 'N/A'}`, 14, 49);
     
     // Examiners
     doc.setFontSize(12);
@@ -124,7 +124,7 @@ export default function PDFExport({ schedule }: PDFExportProps) {
       }
     }
     
-    doc.save(`exam-schedule-${schedule.exam_metadata.exam_name.replace(/\s+/g, '-')}.pdf`);
+    doc.save(`exam-schedule-${(schedule.exam_metadata.exam_name || 'schedule').replace(/\s+/g, '-')}.pdf`);
   };
 
   return (

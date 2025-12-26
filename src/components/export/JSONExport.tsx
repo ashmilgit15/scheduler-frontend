@@ -14,7 +14,7 @@ export default function JSONExport({ schedule }: JSONExportProps) {
     
     const link = document.createElement('a');
     link.href = url;
-    link.download = `exam-schedule-${schedule.exam_metadata.exam_name.replace(/\s+/g, '-')}.json`;
+    link.download = `exam-schedule-${(schedule.exam_metadata.exam_name || 'schedule').replace(/\s+/g, '-')}.json`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
