@@ -88,6 +88,31 @@ export default function Home() {
       }));
       setAutoSelectedDates(newDates);
       setSimpleDates(newDates);
+    } else if (data.register_numbers && data.register_numbers.length > 0) {
+      // If we have students but no dates, auto-generate dates starting from tomorrow
+      const studentCount = data.register_numbers.length;
+      const requiredDays = Math.ceil(studentCount / 125);
+      const generatedDates: ExamDate[] = [];
+      
+      const today = new Date();
+      for (let i = 0; i < requiredDays; i++) {
+        const examDate = new Date(today);
+        examDate.setDate(today.getDate() + 1 + i); // Start from tomorrow
+        const day = String(examDate.getDate()).padStart(2, '0');
+        const month = String(examDate.getMonth() + 1).padStart(2, '0');
+        const year = String(examDate.getFullYear()).slice(-2);
+        generatedDates.push({
+          date: `${day}-${month}-${year}`,
+          subject: data.subjects?.[i] || undefined,
+          register_numbers: [],
+        });
+      }
+      
+      setAutoSelectedDates(generatedDates);
+      setSimpleDates(generatedDates);
+      
+      // Show a warning that dates were auto-generated
+      setWarnings(prev => [...prev, `Auto-generated ${requiredDays} exam date(s) starting from tomorrow. You can modify these in the date picker.`]);
     }
   };
 
@@ -134,6 +159,20 @@ export default function Home() {
       allRegisterNumbers = registerNumbers;
       requestExamDates = simpleDates;
       requestDates = simpleDates.map(ed => ed.date);
+    }
+
+    // Validation: Check if we have students
+    if (allRegisterNumbers.length === 0) {
+      setErrors([{ field: 'register_numbers', message: 'No students found. Please add register numbers or upload an image with student data.' }]);
+      setIsLoading(false);
+      return;
+    }
+
+    // Validation: Check if we have dates
+    if (requestDates.length === 0) {
+      setErrors([{ field: 'dates', message: 'No exam dates selected. Please select dates in the calendar or use Auto Schedule to select dates automatically.' }]);
+      setIsLoading(false);
+      return;
     }
 
     const request: ScheduleRequest = {
